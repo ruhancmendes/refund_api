@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+
+// define os modelos das tabelas dentro do banco de dados
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum UserRole {
+  // define os tipos de usuários
+  employee
+  manager
+}
+
+enum Category {
+  // define as categorias de reembolso
+  food
+  others
+  services
+  transport
+  accommodation
+}
+
+model User {
+  // define o modelo da tabela de usuários
+  id String @id @default(uuid())
+  name String 
+  email String @unique
+  password String
+
+  role UserRole @default(employee)
+
+  refunds Refunds[] // modelo um para muitos (um usuário pode ter vários reembolsos)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("users") // mapeia o nome da tabela no banco de dados
+}
+
+model Refunds {
+  // define o modelo da tabela de reembolsos
+  id String @id @default(uuid())
+  name String
+  amount Float // valor do reembolso
+  category Category
+  filename String
+
+  userId String @map("user_id")
+  user User @relation(fields: [userId], references: [id]) //define relação com a tabela de usuários. modelo muitos para um (muitos reembolsos para um usuário)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@map("refunds")
+}
