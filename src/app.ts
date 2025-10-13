@@ -1,7 +1,11 @@
 // arquivo de entrada da aplicação
 import express from "express" //importando todo o express do noe_modules
+import "express-async-errors" //importa o express-async-errors para lidar com erros em funções assíncronas
 import cors from "cors"
 import { errorHandling } from "@/middlewares/error-handling"
+
+import { routes } from "./routes"
+
 // import { AppError } from "@/utils/AppError" (PARA TESTE)
 // import { z } from "zod" (PARA TESTE)
 
@@ -9,6 +13,8 @@ const app = express() //cria a instância app que usa de molde o express(classe)
 
 app.use(express.json())
 app.use(cors()) //habilita o uso do cors pela aplicação.
+
+app.use(routes) //habilita o uso das rotas pela aplicação.
 
 /*(APENAS PARA TESTE) app.get("/", (req, res) => { 
      throw new AppError("Erro de teste!") 
