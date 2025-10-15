@@ -51,8 +51,73 @@ class RefundsController {
 
     async index(request: Request, response: Response){
         // lógica para listar todas as solicitações de reembolso.
-        response.json({ message: "OK!"})
+        
+        const querySchema = z.object({
+            // validando dados recebidos
+            name: z.string().optional().default(""),
+            page: z.coerce.number().optional().default(1), // página atual
+            perPage: z. coerce.number().optional().default(10), // itens por página.
+        })
+
+        const { name, page, perPage } = querySchema.parse(request.query) // validação de dados;
+
+        // Cálculo para pular os itens das páginas anteriores. skip.
+        const skip = (page-1) * perPage
+
+        const refunds = await prisma.refunds.findMany({
+            // buscando as solicitações no banco de dados. 
+            skip,
+            take: perPage,
+            where: {
+                user: {
+                    name: {
+                       contains: name.trim(), 
+                    }
+                }
+            },
+            orderBy: { createdAt: "desc" }, // ordenando a lista da mais recente para a mais antiga.
+            include: { user: true }, // incluindo dados do usuário que fez a solicitação.
+        })
+        
+        // Obter o total dde registros para calcular o número de páginas.
+        const totalRecords = await prisma.refunds.count({
+            where: {
+                user: {
+                    name: {
+                        contains: name.trim(),
+                    }
+                }
+            }
+        })
+
+        const totalPages = Math.ceil(totalRecords / perPage) // cálculo do total de páginas.
+
+        response.json({
+            refunds,
+            pagination: {
+                page,
+                perPage,
+                totalRecords,
+                totalPages: totalPages > 0 ? totalPages : 1, //garantir que sempre haja pelo menos uma página.
+            }
+        })
     } 
+
+    async show(request: Request, response: Response){
+       // lógica para obter os detalhes de uma solicitação específica.
+        const paramsSchema = z.object({ 
+            id: z.string().uuid(), // validação do ID como UUID.
+        })
+
+        const { id } = paramsSchema.parse(request.params) // validação de dados.
+
+        const refund = await prisma.refunds.findFirst({
+            where: { id },
+            include: { user: true }, // incluindo dados do usuário que fez a solicitação.
+        })
+
+        response.json(refund)
+    }
 }
 
 export { RefundsController}

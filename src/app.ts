@@ -5,6 +5,7 @@ import cors from "cors"
 import { errorHandling } from "@/middlewares/error-handling"
 
 import { routes } from "./routes"
+import uploadConfig from "@/configs/upload"
 
 // import { AppError } from "@/utils/AppError" (PARA TESTE)
 // import { z } from "zod" (PARA TESTE)
@@ -13,6 +14,8 @@ const app = express() //cria a instância app que usa de molde o express(classe)
 
 app.use(express.json())
 app.use(cors()) //habilita o uso do cors pela aplicação.
+
+app.use("/uploads", express.static(uploadConfig.UPLOADS_FOLDER)) // habilita o acesso aos arquivos da pasta de upload via URL.
 
 app.use(routes) //habilita o uso das rotas pela aplicação.
 

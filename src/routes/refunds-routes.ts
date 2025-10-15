@@ -15,4 +15,11 @@ refundsRoutes.get("/",
     verifyUserAuthorization(["manager"]), // middleware de verificação de autorização do usuário.
     refundsController.index
 )
+
+refundsRoutes.get(
+    "/:id",
+    verifyUserAuthorization(["employee", "manager"]), // middleware de verificação de autorização do usuário.
+    refundsController.show
+)
+
 export { refundsRoutes } // exportando as rotas de reembolso

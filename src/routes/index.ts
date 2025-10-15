@@ -5,6 +5,7 @@ import { usersRoutes } from "./users-routes"
 const routes = Router()
 import { sessionsRoutes } from "./sessions-routes"
 import { refundsRoutes } from "./refunds-routes"
+import { uploadsRoutes } from "./uploads-routes"
 
 import { ensureAuthenticated } from "@/middlewares/ensure-authenticated"
 
@@ -15,5 +16,6 @@ routes.use("/sessions", sessionsRoutes)
 // Rotas privadas (somente para usuários autenticados)
 routes.use(ensureAuthenticated) // aplica o middleware de autenticação para as rotas abaixo.
 routes.use("/refunds", refundsRoutes)
+routes.use("/uploads", uploadsRoutes)
 
 export { routes }
